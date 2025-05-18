@@ -6,13 +6,31 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthenticated
+from rest_framework.permissions import (
+    IsAuthenticatedOrReadOnly,
+    IsAdminUser,
+    IsAuthenticated,
+)
 
-from planetarium.models import ShowTheme, AstronomyShow, PlanetariumDome, Reservation, Ticket, ShowSession
+from planetarium.models import (
+    ShowTheme,
+    AstronomyShow,
+    PlanetariumDome,
+    Reservation,
+    Ticket,
+    ShowSession,
+)
 from planetarium.permissions import IsAdminOrIfAuthenticatedReadOnly
-from planetarium.serializers import ShowThemeSerializer, AstronomyShowSerializer, PlanetariumDomeSerializer, \
-    ReservationSerializer, ShowSessionSerializer, AstronomyShowListSerializer, ShowSessionListSerializer, \
-    ReservationListSerializer
+from planetarium.serializers import (
+    ShowThemeSerializer,
+    AstronomyShowSerializer,
+    PlanetariumDomeSerializer,
+    ReservationSerializer,
+    ShowSessionSerializer,
+    AstronomyShowListSerializer,
+    ShowSessionListSerializer,
+    ReservationListSerializer,
+)
 
 
 class ShowThemeViewSet(viewsets.ModelViewSet):
@@ -23,7 +41,9 @@ class ShowThemeViewSet(viewsets.ModelViewSet):
 
 
 class AstronomyShowViewSet(viewsets.ModelViewSet):
-    queryset = AstronomyShow.objects.prefetch_related("show_theme", "show_sessions")
+    queryset = AstronomyShow.objects.prefetch_related(
+        "show_theme", "show_sessions"
+    )
     serializer_class = AstronomyShowSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
@@ -38,7 +58,11 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
 
         queryset = self.queryset
         if title:
-            queryset = queryset.filter(Q(title__icontains=title) | Q(description__icontains=title) | Q(show_theme__name__icontains=title))
+            queryset = queryset.filter(
+                Q(title__icontains=title)
+                | Q(description__icontains=title)
+                | Q(show_theme__name__icontains=title)
+            )
         return queryset.distinct()
 
     @extend_schema(
@@ -46,7 +70,8 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "title",
                 type=OpenApiTypes.STR,
-                description="Search by title of AstronomyShow, ShowTheme or show description.",
+                description="Search by title of AstronomyShow,"
+                            " ShowTheme or show description.",
             ),
         ]
     )
@@ -62,7 +87,9 @@ class PlanetariumDomeViewSet(viewsets.ModelViewSet):
 
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
-    queryset = ShowSession.objects.select_related("astronomy_show", "planetarium_dome").prefetch_related("tickets")
+    queryset = ShowSession.objects.select_related(
+        "astronomy_show", "planetarium_dome"
+    ).prefetch_related("tickets")
     serializer_class = ShowSessionSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
@@ -80,7 +107,10 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
 
         if title:
             queryset = queryset.filter(
-                Q(astronomy_show__title__icontains=title) | Q(astronomy_show__description__icontains=title) | Q(astronomy_show__show_theme__name__icontains=title))
+                Q(astronomy_show__title__icontains=title)
+                | Q(astronomy_show__description__icontains=title)
+                | Q(astronomy_show__show_theme__name__icontains=title)
+            )
 
         if show_time:
             show_time = datetime.strptime(show_time, "%Y-%m-%d").date()
@@ -93,7 +123,8 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
             OpenApiParameter(
                 "title",
                 type=OpenApiTypes.STR,
-                description="Search by title of AstronomyShow, ShowTheme or show description.",
+                description="Search by title of AstronomyShow,"
+                            " ShowTheme or show description.",
             ),
             OpenApiParameter(
                 "show_time",
@@ -109,9 +140,6 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
-
-
-
 class ReservationPagination(PageNumberPagination):
     page_size = 10
     max_page_size = 100
@@ -122,7 +150,9 @@ class ReservationViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet,
 ):
-    queryset = Reservation.objects.select_related("tickets", "user", "show_session")
+    queryset = Reservation.objects.select_related(
+        "tickets", "user", "show_session"
+    )
     serializer_class = ReservationSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
@@ -135,6 +165,6 @@ class ReservationViewSet(
         serializer.save(user=self.request.user)
 
     def get_serializer_class(self):
-        if self.action == 'list':
+        if self.action == "list":
             return ReservationListSerializer
         return ReservationSerializer

@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext as _
 
+
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
 
@@ -39,18 +40,17 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     groups = models.ManyToManyField(
-        'auth.Group',
-        related_name='custom_user_set',  # додано унікальний related_name
+        "auth.Group",
+        related_name="custom_user_set",  # додано унікальний related_name
         blank=True,
-        help_text='The groups this user belongs to.'
+        help_text="The groups this user belongs to.",
     )
     user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        related_name='custom_user_set',  # додано унікальний related_name
+        "auth.Permission",
+        related_name="custom_user_set",  # додано унікальний related_name
         blank=True,
-        help_text='Specific permissions for this user.'
+        help_text="Specific permissions for this user.",
     )
-
 
     username = None
     email = models.EmailField(_("email address"), unique=True)

@@ -5,36 +5,51 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.utils.timezone import make_aware
 
-from planetarium.models import ShowTheme, AstronomyShow, PlanetariumDome, ShowSession, Reservation, Ticket
+from planetarium.models import (
+    ShowTheme,
+    AstronomyShow,
+    PlanetariumDome,
+    ShowSession,
+    Reservation,
+    Ticket,
+)
 from users.models import User
 
 
 class PlanetariumTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(email='user@example.com', password='password123')
+        self.user = User.objects.create_user(
+            email="user@example.com", password="password123"
+        )
         self.client.force_authenticate(user=self.user)
 
         self.theme = ShowTheme.objects.create(name="Cosmos")
-        self.show = AstronomyShow.objects.create(title="Stars", description="A show about stars")
+        self.show = AstronomyShow.objects.create(
+            title="Stars", description="A show about stars"
+        )
         self.show.show_theme.set([self.theme])
 
-        self.dome = PlanetariumDome.objects.create(name="Main Dome", rows=10, seats_in_row=10)
+        self.dome = PlanetariumDome.objects.create(
+            name="Main Dome", rows=10, seats_in_row=10
+        )
 
         self.session = ShowSession.objects.create(
             show_time=make_aware(datetime.datetime(2025, 5, 18, 15, 0)),
             astronomy_show=self.show,
-            planetarium_dome=self.dome
+            planetarium_dome=self.dome,
         )
 
     def test_create_show_theme(self):
         url = reverse("planetarium:showtheme-list")
         data = {"name": "Planets"}
 
-        admin_user = User.objects.create_superuser(email='admin@example.com', password='adminpass')
+        admin_user = User.objects.create_superuser(
+            email="admin@example.com", password="adminpass"
+        )
         self.client.force_authenticate(user=admin_user)
 
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(ShowTheme.objects.count(), 2)
 
@@ -44,15 +59,13 @@ class PlanetariumTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         response_data = response.json()
-        results = response_data.get('results', response_data)
+        results = response_data.get("results", response_data)
         self.assertTrue(any(show["title"] == "Stars" for show in results))
 
     def test_create_reservation(self):
         url = reverse("planetarium:reservation-list")
         data = {
-            "tickets": [
-                {"show_session": self.session.id, "row": 1, "seat": 1}
-            ]
+            "tickets": [{"show_session": self.session.id, "row": 1, "seat": 1}]
         }
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -72,11 +85,13 @@ class PlanetariumTests(TestCase):
 
     def test_get_reservations(self):
         reservation = Reservation.objects.create(user=self.user)
-        Ticket.objects.create(show_session=self.session, reservation=reservation, row=1, seat=2)
+        Ticket.objects.create(
+            show_session=self.session, reservation=reservation, row=1, seat=2
+        )
 
         url = reverse("planetarium:reservation-list")
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        results = response.data.get('results', response.data)
+        results = response.data.get("results", response.data)
         self.assertEqual(len(results), 1)

@@ -12,7 +12,7 @@ class ShowTheme(models.Model):
 class AstronomyShow(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
-    show_theme = ManyToManyField(ShowTheme, related_name='astronomy_shows')
+    show_theme = ManyToManyField(ShowTheme, related_name="astronomy_shows")
 
 
 class PlanetariumDome(models.Model):
@@ -29,30 +29,44 @@ class PlanetariumDome(models.Model):
 
 class ShowSession(models.Model):
     show_time = DateTimeField()
-    astronomy_show = ForeignKey(AstronomyShow, on_delete=models.CASCADE, related_name='show_sessions')
-    planetarium_dome = ForeignKey(PlanetariumDome, on_delete=models.CASCADE, related_name='show_sessions')
+    astronomy_show = ForeignKey(
+        AstronomyShow, on_delete=models.CASCADE, related_name="show_sessions"
+    )
+    planetarium_dome = ForeignKey(
+        PlanetariumDome, on_delete=models.CASCADE, related_name="show_sessions"
+    )
 
 
 class Reservation(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reservations')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="reservations"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.email} - {self.created_at}"
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
 
 class Ticket(models.Model):
-    show_session = ForeignKey(ShowSession, on_delete=models.CASCADE, related_name='tickets')
-    reservation = ForeignKey(Reservation, on_delete=models.CASCADE, related_name='tickets')
+    show_session = ForeignKey(
+        ShowSession, on_delete=models.CASCADE, related_name="tickets"
+    )
+    reservation = ForeignKey(
+        Reservation, on_delete=models.CASCADE, related_name="tickets"
+    )
     row = models.IntegerField()
     seat = models.IntegerField()
 
     @staticmethod
     def validate_ticket(row, seat, planetarium_dome, error_to_raise):
-        for ticket_attr_value, ticket_attr_name, planetarium_dome_attr_name in [
+        for (
+            ticket_attr_value,
+            ticket_attr_name,
+            planetarium_dome_attr_name,
+        ) in [
             (row, "row", "rows"),
             (seat, "seat", "seats_in_row"),
         ]:
@@ -61,9 +75,9 @@ class Ticket(models.Model):
                 raise error_to_raise(
                     {
                         ticket_attr_name: f"{ticket_attr_name} "
-                                          f"number must be in available range: "
-                                          f"(1, {planetarium_dome_attr_name}): "
-                                          f"(1, {count_attrs})"
+                        f"number must be in available range: "
+                        f"(1, {planetarium_dome_attr_name}): "
+                        f"(1, {count_attrs})"
                     }
                 )
 
@@ -91,4 +105,4 @@ class Ticket(models.Model):
         return f"{self.reservation.user.email} - {self.row} - {self.seat}"
 
     class Meta:
-        ordering = ['row', 'seat']
+        ordering = ["row", "seat"]

@@ -3,7 +3,14 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from rest_framework.relations import SlugRelatedField
 
-from planetarium.models import ShowTheme, AstronomyShow, PlanetariumDome, ShowSession, Reservation, Ticket
+from planetarium.models import (
+    ShowTheme,
+    AstronomyShow,
+    PlanetariumDome,
+    ShowSession,
+    Reservation,
+    Ticket,
+)
 
 
 class ShowThemeSerializer(serializers.ModelSerializer):
@@ -89,7 +96,6 @@ class ShowSessionListSerializer(serializers.ModelSerializer):
         slug_field="name",
     )
 
-
     class Meta:
         model = ShowSession
         fields = (
@@ -108,7 +114,7 @@ class TicketSerializer(serializers.ModelSerializer):
             attrs["row"],
             attrs["seat"],
             attrs["show_session"].planetarium_dome,
-            ValidationError
+            ValidationError,
         )
         return data
 
@@ -147,11 +153,7 @@ class ReservationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reservation
-        fields = (
-            "id",
-            "created_at",
-            "tickets"
-        )
+        fields = ("id", "created_at", "tickets")
 
     def create(self, validated_data):
         with transaction.atomic():
