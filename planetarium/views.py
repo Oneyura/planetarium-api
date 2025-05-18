@@ -2,10 +2,12 @@ import datetime
 
 from django.db.models import Q
 from rest_framework import viewsets, mixins
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, IsAuthenticated
 
 from planetarium.models import ShowTheme, AstronomyShow, PlanetariumDome, Reservation, Ticket, ShowSession
+from planetarium.permissions import IsAdminOrIfAuthenticatedReadOnly
 from planetarium.serializers import ShowThemeSerializer, AstronomyShowSerializer, PlanetariumDomeSerializer, \
     ReservationSerializer, ShowSessionSerializer, AstronomyShowListSerializer, ShowSessionListSerializer, \
     ReservationListSerializer
@@ -14,13 +16,15 @@ from planetarium.serializers import ShowThemeSerializer, AstronomyShowSerializer
 class ShowThemeViewSet(viewsets.ModelViewSet):
     queryset = ShowTheme.objects.all()
     serializer_class = ShowThemeSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminUser,)
 
 
 class AstronomyShowViewSet(viewsets.ModelViewSet):
     queryset = AstronomyShow.objects.prefetch_related("show_theme", "show_sessions")
     serializer_class = AstronomyShowSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
@@ -39,13 +43,15 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
 class PlanetariumDomeViewSet(viewsets.ModelViewSet):
     queryset = PlanetariumDome.objects.all()
     serializer_class = PlanetariumDomeSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminUser,)
 
 
 class ShowSessionViewSet(viewsets.ModelViewSet):
     queryset = ShowSession.objects.select_related("astronomy_show", "planetarium_dome").prefetch_related("tickets")
     serializer_class = ShowSessionSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
@@ -84,7 +90,8 @@ class ReservationViewSet(
 ):
     queryset = Reservation.objects.select_related("tickets", "user", "show_session")
     serializer_class = ReservationSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
     pagination_class = ReservationPagination
 
     def get_queryset(self):
