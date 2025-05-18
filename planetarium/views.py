@@ -1,6 +1,8 @@
 import datetime
 
 from django.db.models import Q
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.pagination import PageNumberPagination
@@ -39,6 +41,18 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(Q(title__icontains=title) | Q(description__icontains=title) | Q(show_theme__name__icontains=title))
         return queryset.distinct()
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "title",
+                type=OpenApiTypes.STR,
+                description="Search by title of AstronomyShow, ShowTheme or show description.",
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
 
 class PlanetariumDomeViewSet(viewsets.ModelViewSet):
     queryset = PlanetariumDome.objects.all()
@@ -73,6 +87,26 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(show_time=show_time)
 
         return queryset.distinct()
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "title",
+                type=OpenApiTypes.STR,
+                description="Search by title of AstronomyShow, ShowTheme or show description.",
+            ),
+            OpenApiParameter(
+                "show_time",
+                type=OpenApiTypes.DATE,
+                description=(
+                    "Filter by show_time of ShowSession "
+                    "(ex. ?date=2022-10-23)"
+                ),
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
 
 
