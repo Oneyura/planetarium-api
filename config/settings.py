@@ -133,3 +133,8 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
 }
+
+REST_FRAMEWORK = {
+   "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+   "PAGE_SIZE": 10
+}
