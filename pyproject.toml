@@ -1,0 +1,14 @@
+[tool.black]
+line-length = 79
+target-version = ['py310']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.venv
+  | build
+  | dist
+  | migrations
+  | __pycache__
+  | .*_pb2\.py
+)/
+'''
