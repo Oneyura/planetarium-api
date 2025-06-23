@@ -41,13 +41,13 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     groups = models.ManyToManyField(
         "auth.Group",
-        related_name="custom_user_set",  # додано унікальний related_name
+        related_name="custom_user_set",
         blank=True,
         help_text="The groups this user belongs to.",
     )
     user_permissions = models.ManyToManyField(
         "auth.Permission",
-        related_name="custom_user_set",  # додано унікальний related_name
+        related_name="custom_user_set",
         blank=True,
         help_text="Specific permissions for this user.",
     )
