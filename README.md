@@ -75,14 +75,14 @@ python manage.py runserver
 ### Show Themes
 
 ```http
-GET    /api/planetarium/show_themes/       # List all themes (auth: optional)
+GET    /api/planetarium/show_themes/       # List all themes (auth: required)
 POST   /api/planetarium/show_themes/       # Create new theme (auth: admin)
 ```
 
 ### Astronomy Shows
 
 ```http
-GET    /api/planetarium/astronomy_shows/   # Show list with filters (auth: optional)
+GET    /api/planetarium/astronomy_shows/   # Show list with filters (auth: required)
 POST   /api/planetarium/astronomy_shows/   # Create a show (auth: admin)
 ```
 
@@ -95,7 +95,7 @@ GET    /api/planetarium/planetarium_domes/ # List domes (auth: admin)
 ### Show Sessions
 
 ```http
-GET    /api/planetarium/show_sessions/     # Get sessions (auth: optional)
+GET    /api/planetarium/show_sessions/     # Get sessions (auth: required)
 POST   /api/planetarium/show_sessions/     # Create session (auth: admin)
 ```
 
