@@ -5,7 +5,7 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema
 from planetarium.schemas import astronomy_show_list_params, show_session_list_params
 from rest_framework import viewsets, mixins
-from rest_framework.authentication import TokenAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly,
@@ -37,7 +37,7 @@ from planetarium.serializers import (
 class ShowThemeViewSet(viewsets.ModelViewSet):
     queryset = ShowTheme.objects.all()
     serializer_class = ShowThemeSerializer
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAdminUser,)
 
 
@@ -46,7 +46,7 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
         "show_theme", "show_sessions"
     )
     serializer_class = AstronomyShowSerializer
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
@@ -74,7 +74,7 @@ class AstronomyShowViewSet(viewsets.ModelViewSet):
 class PlanetariumDomeViewSet(viewsets.ModelViewSet):
     queryset = PlanetariumDome.objects.all()
     serializer_class = PlanetariumDomeSerializer
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAdminUser,)
 
 
@@ -83,7 +83,7 @@ class ShowSessionViewSet(viewsets.ModelViewSet):
         "astronomy_show", "planetarium_dome"
     ).prefetch_related("tickets")
     serializer_class = ShowSessionSerializer
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAdminOrIfAuthenticatedReadOnly,)
 
     def get_serializer_class(self):
@@ -129,7 +129,7 @@ class ReservationViewSet(
         "tickets", "user", "show_session"
     )
     serializer_class = ReservationSerializer
-    authentication_classes = (TokenAuthentication,)
+    authentication_classes = (JWTAuthentication,)
     permission_classes = (IsAuthenticated,)
     pagination_class = ReservationPagination
 
